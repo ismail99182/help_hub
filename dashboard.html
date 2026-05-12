@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - HelpHub AI</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    .dashboard-nav {
+      display: flex;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: var(--spacing-lg);
+    }
+
+    .dashboard-nav a {
+      color: var(--text-muted);
+      font-weight: 500;
+      padding-bottom: var(--spacing-md);
+      border-bottom: 2px solid transparent;
+      transition: all var(--transition-base);
+    }
+
+    .dashboard-nav a.active {
+      color: var(--teal-accent);
+      border-bottom-color: var(--teal-accent);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+      color: white;
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-xl);
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      color: white;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .stat-card p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-nav {
+        flex-wrap: wrap;
+      }
+
+      .quick-actions {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-badge">H</div>
+        <span>HelpHub AI</span>
+      </div>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="explore.html">Explore</a>
+        <a href="messages.html">Messages</a>
+        <a href="profile.html">Profile</a>
+        <a href="index.html" class="btn btn-secondary btn-small" onclick="localStorage.removeItem('helphub_currentUser')">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <div id="user-greeting">
+        <!-- Populated by JavaScript -->
+      </div>
+
+      <!-- Dashboard Navigation -->
+      <div class="dashboard-nav">
+        <a href="#" class="active" onclick="showSection('overview')">Overview</a>
+        <a href="#" onclick="showSection('requests')">My Requests</a>
+        <a href="#" onclick="showSection('helping')">Helping</a>
+        <a href="#" onclick="showSection('messages')">Messages</a>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <a href="create-request.html" class="btn btn-primary">+ Create Request</a>
+        <a href="explore.html" class="btn btn-secondary">Browse Requests</a>
+        <a href="messages.html" class="btn btn-secondary">View Messages</a>
+      </div>
+
+      <!-- Overview Section -->
+      <div id="overview-section">
+        <div class="dashboard-grid">
+          <div class="stat-card">
+            <h3>0</h3>
+            <p>Active Requests</p>
+          </div>
+          <div class="stat-card">
+            <h3>0</h3>
+            <p>Helping</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="trust-score">100%</h3>
+            <p>Trust Score</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="contributions">0</h3>
+            <p>Contributions</p>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <!-- Recent Activity -->
+          <div class="card">
+            <h3 class="mb-lg">Recent Activity</h3>
+            <p class="text-muted">No recent activity yet. Create a request or help someone!</p>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="card">
+            <h3 class="mb-lg">Your Stats</h3>
+            <div class="flex-between mb-md">
+              <span>Trust Score</span>
+              <span class="font-semibold" id="stat-trust">100%</span>
+            </div>
+            <div class="flex-between mb-md">
+              <span>Contributions</span>
+              <span class="font-semibold" id="stat-contrib">0</span>
+            </div>
+            <div class="flex-between">
+              <span>Badges</span>
+              <span class="font-semibold" id="stat-badges">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Requests Section -->
+      <div id="requests-section" class="hidden">
+        <h3 class="mb-lg">Your Requests</h3>
+        <div id="user-requests-list">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Helping Section -->
+      <div id="helping-section" class="hidden">
+        <h3 class="mb-lg">Requests You're Helping With</h3>
+        <p class="text-muted">You haven't started helping anyone yet.</p>
+      </div>
+
+      <!-- Messages Section -->
+      <div id="messages-section" class="hidden">
+        <h3 class="mb-lg">Recent Messages</h3>
+        <a href="messages.html" class="btn btn-primary">Go to Messages</a>
+      </div>
+    </div>
+  </section>
+
+  <script src="data/sample-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    function loadDashboard() {
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        navigateTo('login');
+        return;
+      }
+
+      // Update greeting
+      const greeting = document.getElementById('user-greeting');
+      greeting.innerHTML = `
+        <div class="flex-between mb-xl">
+          <div>
+            <h2>Welcome back, ${currentUser.name}</h2>
+            <p class="text-muted">${currentUser.role === 'both' ? 'Both asking and helping' : currentUser.role === 'need-help' ? 'Looking for help' : 'Ready to help others'}</p>
+          </div>
+          <a href="profile.html" class="btn btn-secondary">View Profile</a>
+        </div>
+      `;
+
+      // Update stats
+      document.getElementById('trust-score').textContent = currentUser.trustScore + '%';
+      document.getElementById('contributions').textContent = currentUser.contributions;
+      document.getElementById('stat-trust').textContent = currentUser.trustScore + '%';
+      document.getElementById('stat-contrib').textContent = currentUser.contributions;
+      document.getElementById('stat-badges').textContent = currentUser.badges.length;
+
+      // Load user's requests
+      const requests = getRequests().filter(r => r.requester === currentUser.id);
+      const requestsList = document.getElementById('user-requests-list');
+      if (requests.length === 0) {
+        requestsList.innerHTML = '<p class="text-muted">You haven\'t created any requests yet. <a href="create-request.html">Create one now</a></p>';
+      } else {
+        requestsList.innerHTML = requests.map(req => renderRequestCard(req)).join('');
+      }
+    }
+
+    function showSection(section) {
+      // Hide all sections
+      document.getElementById('overview-section').classList.add('hidden');
+      document.getElementById('requests-section').classList.add('hidden');
+      document.getElementById('helping-section').classList.add('hidden');
+      document.getElementById('messages-section').classList.add('hidden');
+
+      // Show selected section
+      document.getElementById(section + '-section').classList.remove('hidden');
+
+      // Update nav
+      document.querySelectorAll('.dashboard-nav a').forEach(link => {
+        link.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+  </script>
+</body>
+</html>

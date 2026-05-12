@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - HelpHub AI</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    .login-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-xl);
+      min-height: calc(100vh - 80px);
+      align-items: center;
+      padding: var(--spacing-xl);
+    }
+
+    .login-left {
+      background: linear-gradient(135deg, #1a2e1a 0%, #0f766e 100%);
+      color: white;
+      padding: var(--spacing-3xl);
+      border-radius: var(--radius-2xl);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .login-left h2 {
+      color: white;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .login-left ul {
+      list-style: none;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .login-left li {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .login-left li:before {
+      content: "•";
+      color: var(--teal-light);
+      font-weight: bold;
+    }
+
+    .login-right {
+      padding: var(--spacing-xl);
+    }
+
+    .login-right h2 {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    @media (max-width: 1024px) {
+      .login-container {
+        grid-template-columns: 1fr;
+      }
+
+      .login-left {
+        padding: var(--spacing-2xl);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-badge">H</div>
+        <span>HelpHub AI</span>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="explore.html">Explore</a>
+        <a href="leaderboard.html">Leaderboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Login Container -->
+  <div class="login-container">
+    <!-- Left: Info Card -->
+    <div class="login-left">
+      <p class="section-title" style="color: rgba(255, 255, 255, 0.7);">COMMUNITY ACCESS</p>
+      <h2>Enter the support network.</h2>
+      <p style="margin-bottom: var(--spacing-lg); color: rgba(255, 255, 255, 0.8);">
+        Choose a demo identity, set your role, and jump into a multi-page product flow designed for asking, offering, and tracking help with a premium interface.
+      </p>
+      <ul>
+        <li>Role-based entry for Need Help, Can Help, or Both</li>
+        <li>Direct path into dashboard, requests, AI Center, and community feed</li>
+        <li>Persistent demo session powered by LocalStorage</li>
+      </ul>
+    </div>
+
+    <!-- Right: Login Form -->
+    <div class="login-right">
+      <p class="section-title">LOGIN / SIGNUP</p>
+      <h2>Authenticate your community profile</h2>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label>Select demo user</label>
+          <select id="user-select" required>
+            <option value="">Choose a user...</option>
+            <option value="user-1">Ayesha Khan (Designer & Mentor)</option>
+            <option value="user-2">Hassan Ali (Developer & Helper)</option>
+            <option value="user-3">Sara Noor (Data Analyst & Learner)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Role selection</label>
+          <select id="role-select" required>
+            <option value="both">Both</option>
+            <option value="need-help">Need Help</option>
+            <option value="can-help">Can Help</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" placeholder="community@helphub.ai" value="community@helphub.ai" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="••••••••" value="demo123" readonly>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: var(--spacing-md);">
+          Continue to dashboard
+        </button>
+      </form>
+
+      <p class="text-center text-muted mt-lg" style="font-size: 0.9rem;">
+        Demo credentials are pre-filled. Select a user and role to proceed.
+      </p>
+    </div>
+  </div>
+
+  <script src="data/sample-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const userId = document.getElementById('user-select').value;
+      const role = document.getElementById('role-select').value;
+
+      if (!userId) {
+        alert('Please select a user');
+        return;
+      }
+
+      const users = getUsers();
+      const user = users.find(u => u.id === userId);
+
+      if (user) {
+        user.role = role;
+        setCurrentUser(user);
+        localStorage.setItem('helphub_userRole', role);
+        navigateTo('dashboard');
+      }
+    });
+
+    // Update email based on selected user
+    document.getElementById('user-select').addEventListener('change', (e) => {
+      const userId = e.target.value;
+      const users = getUsers();
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        document.getElementById('email').value = user.email;
+      }
+    });
+  </script>
+</body>
+</html>

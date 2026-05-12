@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Center - HelpHub AI</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .stat-card {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      box-shadow: var(--card-shadow);
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      color: var(--teal-accent);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .stat-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .recommendations-section {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--card-shadow);
+    }
+
+    .recommendation-item {
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid var(--border-light);
+      transition: all var(--transition-base);
+    }
+
+    .recommendation-item:hover {
+      background-color: rgba(13, 148, 136, 0.05);
+      border-radius: var(--radius-md);
+    }
+
+    .recommendation-item:last-child {
+      border-bottom: none;
+    }
+
+    .recommendation-title {
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .recommendation-description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .recommendation-tags {
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+    }
+
+    .insight-badge {
+      background-color: rgba(13, 148, 136, 0.1);
+      color: var(--teal-accent);
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-badge">H</div>
+        <span>HelpHub AI</span>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="explore.html">Explore</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="ai-center.html">AI Center</a>
+        <a href="login.html" class="btn btn-primary btn-small">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container">
+      <p class="section-title" style="color: rgba(255, 255, 255, 0.7);">AI CENTER</p>
+      <h1>See what the platform intelligence is noticing.</h1>
+      <p>AI-like insights summarize demand trends, helper readiness, urgency signals, and request recommendations.</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <p class="section-title">TREND PULSE</p>
+          <h3>Web Development</h3>
+          <p>Most common support area based on active community requests.</p>
+        </div>
+
+        <div class="stat-card">
+          <p class="section-title">URGENCY WATCH</p>
+          <h3>2</h3>
+          <p>Requests currently flagged high priority by the urgency detector.</p>
+        </div>
+
+        <div class="stat-card">
+          <p class="section-title">MENTOR POOL</p>
+          <h3>2</h3>
+          <p>Trusted helpers with strong response history and contribution signals.</p>
+        </div>
+      </div>
+
+      <!-- Recommendations Section -->
+      <div class="recommendations-section">
+        <p class="section-title">AI RECOMMENDATIONS</p>
+        <h2 class="mb-lg">Requests needing attention</h2>
+
+        <div id="recommendations-list">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="data/sample-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    function loadRecommendations() {
+      const requests = getRequests();
+      const recommendations = requests.filter(r => r.status === 'Open').slice(0, 4);
+
+      const container = document.getElementById('recommendations-list');
+      container.innerHTML = recommendations.map(req => {
+        const requester = getUserById(req.requester);
+        return `
+          <div class="recommendation-item">
+            <div class="flex-between mb-md">
+              <div class="recommendation-title">${req.title}</div>
+              <span class="insight-badge">${req.urgency}</span>
+            </div>
+            <p class="recommendation-description">${req.description}</p>
+            <div class="recommendation-tags">
+              ${req.tags.map(tag => renderTag(tag)).join('')}
+            </div>
+            <div class="flex-between mt-lg">
+              <span class="text-sm text-light">${requester.name} • ${req.location}</span>
+              <a href="request-detail.html?id=${req.id}" class="btn btn-small btn-secondary">View</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadRecommendations);
+  </script>
+</body>
+</html>

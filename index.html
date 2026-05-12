@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HelpHub AI - Community Support Network</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-badge">H</div>
+        <span>HelpHub AI</span>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="explore.html">Explore</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="ai-center.html">AI Center</a>
+        <a href="notifications.html" class="text-teal">Live community signals</a>
+        <a href="login.html" class="btn btn-primary btn-small">Join the platform</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-2">
+        <!-- Left: Main Hero -->
+        <div>
+          <p class="section-title">SMIT GRAND CODING NIGHT 2026</p>
+          <h1>Find help faster. Become help that matters.</h1>
+          <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: var(--spacing-lg);">
+            HelpHub AI is a community-powered support network for students, mentors, creators, and builders. Ask for help, offer help, track impact, and let AI surface smarter matches across the platform.
+          </p>
+          <div class="flex gap-md">
+            <button class="btn btn-primary" onclick="navigateTo('login')">Open product demo</button>
+            <button class="btn btn-secondary" onclick="navigateTo('create-request')">Post a request</button>
+          </div>
+
+          <!-- Stats -->
+          <div class="grid grid-3 mt-xl">
+            <div class="card card-compact">
+              <p class="section-title">MEMBERS</p>
+              <h3>384+</h3>
+              <p class="text-sm text-light">Students, mentors, and helpers in the loop.</p>
+            </div>
+            <div class="card card-compact">
+              <p class="section-title">REQUESTS</p>
+              <h3>72+</h3>
+              <p class="text-sm text-light">Support posts across learning journeys.</p>
+            </div>
+            <div class="card card-compact">
+              <p class="section-title">SOLVED</p>
+              <h3>69+</h3>
+              <p class="text-sm text-light">Problems resolved through fast community action.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Product Feel Card -->
+        <div class="card" style="background: linear-gradient(135deg, #1a2e1a 0%, #0f766e 100%); color: white; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <p class="section-title" style="color: rgba(255, 255, 255, 0.7);">LIVE PRODUCT FEEL</p>
+            <h2 style="color: white; margin-bottom: var(--spacing-lg);">More than a form. More like an ecosystem.</h2>
+            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: var(--spacing-lg);">
+              A polished multi-page experience inspired by product platforms, with AI summaries, trust scores, contribution signals, notifications, and leaderboard momentum built directly in HTML, CSS, JavaScript, and LocalStorage.
+            </p>
+          </div>
+
+          <div class="mt-xl">
+            <div class="card card-compact" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
+              <h5 style="color: white;">AI request intelligence</h5>
+              <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">Auto-categorization, urgency detection, tags, rewrite suggestions, and trend snapshots.</p>
+            </div>
+
+            <div class="card card-compact mt-lg" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
+              <h5 style="color: white;">Community trust graph</h5>
+              <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">Badges, helper rankings, trust score boosts, and visible contribution history.</p>
+            </div>
+
+            <div class="card card-compact mt-lg" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
+              <h5 style="color: white;">100%</h5>
+              <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">Top trust score currently active across the sample mentor network.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Flow Section -->
+  <section class="section" style="background-color: var(--cream-bg);">
+    <div class="container">
+      <div class="flex-between mb-lg">
+        <div>
+          <p class="section-title">CORE FLOW</p>
+          <h2>From struggling alone to solving together</h2>
+        </div>
+        <a href="explore.html" class="btn btn-secondary">Try onboarding AI</a>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="card">
+          <h4>Ask for help clearly</h4>
+          <p>Create structured requests with category, urgency, AI suggestions, and tags that attract the right people.</p>
+        </div>
+        <div class="card">
+          <h4>Discover the right people</h4>
+          <p>Use the explore feed, helper lists, notifications, and messaging to move quickly once a match happens.</p>
+        </div>
+        <div class="card">
+          <h4>Track real contribution</h4>
+          <p>Trust scores, badges, solved requests, and rankings help the community recognize meaningful support.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Requests Section -->
+  <section class="section">
+    <div class="container">
+      <div class="flex-between mb-lg">
+        <div>
+          <p class="section-title">FEATURED REQUESTS</p>
+          <h2>Community problems currently in motion</h2>
+        </div>
+        <a href="explore.html" class="btn btn-secondary">View full feed</a>
+      </div>
+
+      <div id="featured-requests" class="grid grid-3">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background-color: var(--dark-hero); color: white; padding: var(--spacing-2xl) var(--spacing-xl); text-align: center;">
+    <div class="container">
+      <p>HelpHub AI is built as a premium, feel, multi-page community support product using HTML, CSS, JavaScript, and LocalStorage.</p>
+    </div>
+  </footer>
+
+  <script src="data/sample-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    // Populate featured requests
+    function populateFeaturedRequests() {
+      const requests = getRequests().slice(0, 3);
+      const container = document.getElementById('featured-requests');
+      container.innerHTML = requests.map(req => renderRequestCard(req)).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', populateFeaturedRequests);
+  </script>
+</body>
+</html>

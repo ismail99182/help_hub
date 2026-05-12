@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - HelpHub AI</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    .profile-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-xl);
+      margin-top: var(--spacing-xl);
+    }
+
+    .profile-hero {
+      background: linear-gradient(135deg, #1a2e1a 0%, #0f766e 100%);
+      color: white;
+      padding: var(--spacing-3xl);
+      border-radius: var(--radius-2xl);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .profile-hero h1 {
+      color: white;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .profile-hero p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.1rem;
+    }
+
+    .badge-large {
+      width: 4rem;
+      height: 4rem;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .badges-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .badge-pill {
+      background-color: rgba(13, 148, 136, 0.1);
+      color: var(--teal-accent);
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-xl);
+      font-size: 0.875rem;
+      font-weight: 500;
+      border: 1px solid var(--teal-accent);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-md) 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    @media (max-width: 1024px) {
+      .profile-container {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-badge">H</div>
+        <span>HelpHub AI</span>
+      </div>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="explore.html">Explore</a>
+        <a href="profile.html">Profile</a>
+        <a href="index.html" class="btn btn-secondary btn-small" onclick="localStorage.removeItem('helphub_currentUser')">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Profile Hero -->
+  <div id="profile-hero-section">
+    <!-- Populated by JavaScript -->
+  </div>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <div class="profile-container">
+        <!-- Left: Public Profile -->
+        <div class="card">
+          <p class="section-title">PUBLIC PROFILE</p>
+          <h3 class="mb-lg">Skills and reputation</h3>
+
+          <div class="stat-row">
+            <span>Trust score</span>
+            <span class="font-semibold" id="profile-trust">100%</span>
+          </div>
+
+          <div class="stat-row">
+            <span>Contributions</span>
+            <span class="font-semibold" id="profile-contrib">0</span>
+          </div>
+
+          <div class="mt-lg">
+            <h5 class="mb-md">Skills</h5>
+            <div class="skills-list" id="profile-skills">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+
+          <div class="mt-lg">
+            <h5 class="mb-md">Badges</h5>
+            <div class="badges-list" id="profile-badges">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Edit Profile -->
+        <div class="card">
+          <p class="section-title">EDIT PROFILE</p>
+          <h3 class="mb-lg">Update your identity</h3>
+
+          <form id="edit-profile-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="profile-name" required>
+              </div>
+              <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="profile-location" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Skills (comma-separated)</label>
+              <input type="text" id="profile-skills-input" placeholder="Figma, UI/UX, HTML/CSS">
+            </div>
+
+            <div class="form-group">
+              <label>Interests (comma-separated)</label>
+              <input type="text" id="profile-interests" placeholder="Hackathons, UI/UX, Community Building">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: var(--spacing-md);">
+              Save profile
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="data/sample-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    function loadProfile() {
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        navigateTo('login');
+        return;
+      }
+
+      // Hero section
+      const heroSection = document.getElementById('profile-hero-section');
+      heroSection.innerHTML = `
+        <div class="hero">
+          <div class="container">
+            <p class="section-title" style="color: rgba(255, 255, 255, 0.7);">PROFILE</p>
+            <div class="flex gap-lg align-items-center">
+              <div class="badge badge-large">${currentUser.avatar}</div>
+              <div>
+                <h1>${currentUser.name}</h1>
+                <p>${currentUser.role === 'both' ? 'Both • ' : ''}${currentUser.location}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Fill form
+      document.getElementById('profile-name').value = currentUser.name;
+      document.getElementById('profile-location').value = currentUser.location;
+      document.getElementById('profile-skills-input').value = currentUser.skills.join(', ');
+      document.getElementById('profile-interests').value = currentUser.interests.join(', ');
+
+      // Display stats
+      document.getElementById('profile-trust').textContent = currentUser.trustScore + '%';
+      document.getElementById('profile-contrib').textContent = currentUser.contributions;
+
+      // Display skills
+      const skillsList = document.getElementById('profile-skills');
+      skillsList.innerHTML = currentUser.skills.map(skill => `<span class="badge-pill">${skill}</span>`).join('');
+
+      // Display badges
+      const badgesList = document.getElementById('profile-badges');
+      badgesList.innerHTML = currentUser.badges.map(badge => `<span class="badge-pill">${badge}</span>`).join('');
+
+      // Form submission
+      document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        currentUser.name = document.getElementById('profile-name').value;
+        currentUser.location = document.getElementById('profile-location').value;
+        currentUser.skills = document.getElementById('profile-skills-input').value.split(',').map(s => s.trim());
+        currentUser.interests = document.getElementById('profile-interests').value.split(',').map(s => s.trim());
+
+        setCurrentUser(currentUser);
+        alert('Profile updated successfully!');
+        loadProfile();
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProfile);
+  </script>
+</body>
+</html>

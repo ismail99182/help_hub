@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Detail - HelpHub AI</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    .detail-container {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: var(--spacing-xl);
+      margin-top: var(--spacing-xl);
+    }
+
+    .detail-main {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+    }
+
+    .detail-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+    }
+
+    .helper-item {
+      display: flex;
+      gap: var(--spacing-md);
+      align-items: flex-start;
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .helper-item:last-child {
+      border-bottom: none;
+    }
+
+    .helper-info {
+      flex: 1;
+    }
+
+    .trust-badge {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--green-solved);
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .actions {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-lg);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      color: var(--teal-accent);
+      margin-bottom: var(--spacing-lg);
+      cursor: pointer;
+    }
+
+    @media (max-width: 1024px) {
+      .detail-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-badge">H</div>
+        <span>HelpHub AI</span>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="explore.html">Explore</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="ai-center.html">AI Center</a>
+        <a href="login.html" class="btn btn-primary btn-small">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <a class="back-link" onclick="history.back()">← Back to requests</a>
+
+      <div id="request-detail" class="detail-container">
+        <!-- Loading state -->
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </section>
+
+  <script src="data/sample-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    function getQueryParam(param) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(param);
+    }
+
+    function loadRequestDetail() {
+      const requestId = getQueryParam('id');
+      const request = getRequestById(requestId);
+      const requester = getUserById(request.requester);
+
+      const container = document.getElementById('request-detail');
+
+      // Get helpers (sample data)
+      const helpers = [
+        { id: 'user-1', name: 'Ayesha Khan', skills: 'Figma, UI/UX, HTML/CSS', trustScore: 100 },
+        { id: 'user-2', name: 'Hassan Ali', skills: 'JavaScript, React, Git/GitHub', trustScore: 88 }
+      ];
+
+      const urgencyClass = request.urgency === 'High' ? 'tag-urgent' : request.urgency === 'Medium' ? 'tag-medium' : '';
+      const statusClass = request.status === 'Solved' ? 'tag-status' : '';
+
+      container.innerHTML = `
+        <div class="detail-main">
+          <!-- Hero Section -->
+          <div class="hero">
+            <div class="flex gap-md mb-md">
+              ${renderTag(request.category)}
+              ${renderTag(request.urgency, urgencyClass === 'tag-urgent' ? 'urgent' : 'medium')}
+              ${request.status === 'Solved' ? renderTag(request.status, 'status') : ''}
+            </div>
+            <h1>${request.title}</h1>
+            <p>${request.description}</p>
+          </div>
+
+          <!-- AI Summary -->
+          <div class="card">
+            <p class="section-title">AI SUMMARY</p>
+            <div class="flex gap-md mb-md align-items-center">
+              <div class="badge">H</div>
+              <span class="font-semibold">HelpHub AI</span>
+            </div>
+            <p class="text-muted mb-lg">entry-level frontend interviews.</p>
+            <div class="flex gap-md">
+              ${request.tags.map(tag => renderTag(tag)).join('')}
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="card">
+            <p class="section-title">ACTIONS</p>
+            <div class="actions">
+              <button class="btn btn-primary">I can help</button>
+              <button class="btn btn-secondary">Mark as solved</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-sidebar">
+          <!-- Requester -->
+          <div class="card">
+            <p class="section-title">REQUESTER</p>
+            <div class="flex gap-md mb-md align-items-center">
+              <div class="badge">${requester.avatar}</div>
+              <div>
+                <h5>${requester.name}</h5>
+                <p class="text-sm text-light">${requester.location}</p>
+              </div>
+            </div>
+            <div class="flex gap-md">
+              <a href="profile.html?id=${requester.id}" class="btn btn-secondary btn-small">Dashboard</a>
+              <a href="messages.html?to=${requester.id}" class="btn btn-secondary btn-small">Messages</a>
+            </div>
+          </div>
+
+          <!-- Helpers -->
+          <div class="card">
+            <p class="section-title">HELPERS</p>
+            <h4>People ready to support</h4>
+            <div>
+              ${helpers.map(helper => `
+                <div class="helper-item">
+                  <div class="badge">${helper.id === 'user-1' ? 'AK' : 'HA'}</div>
+                  <div class="helper-info">
+                    <h5>${helper.name}</h5>
+                    <p class="text-sm text-light">${helper.skills}</p>
+                    <div class="trust-badge">Trust ${helper.trustScore}%</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadRequestDetail);
+  </script>
+</body>
+</html>

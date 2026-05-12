@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore - HelpHub AI</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    .explore-container {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: var(--spacing-xl);
+      margin-top: var(--spacing-xl);
+    }
+
+    .filter-panel {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+    }
+
+    .filter-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .filter-group h5 {
+      margin-bottom: var(--spacing-md);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-sm);
+      cursor: pointer;
+    }
+
+    .filter-option input[type="checkbox"] {
+      width: auto;
+      cursor: pointer;
+    }
+
+    .filter-option label {
+      margin: 0;
+      cursor: pointer;
+      font-weight: 400;
+    }
+
+    .requests-grid {
+      display: grid;
+      gap: var(--spacing-lg);
+    }
+
+    .card-request {
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+
+    .card-request:hover {
+      box-shadow: var(--card-shadow-lg);
+    }
+
+    @media (max-width: 1024px) {
+      .explore-container {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-panel {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-badge">H</div>
+        <span>HelpHub AI</span>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="explore.html">Explore</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="ai-center.html">AI Center</a>
+        <a href="login.html" class="btn btn-primary btn-small">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container">
+      <p class="section-title" style="color: rgba(255, 255, 255, 0.7);">EXPLORE / FEED</p>
+      <h1>Browse help requests with filterable community context.</h1>
+      <p>Filter by category, urgency, skills, and location to surface the best matches.</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <div class="explore-container">
+        <!-- Filters Panel -->
+        <div class="filter-panel">
+          <h3 style="margin-bottom: var(--spacing-lg);">Refine the feed</h3>
+
+          <div class="filter-group">
+            <h5>Category</h5>
+            <select id="category-filter" style="width: 100%;">
+              <option value="">All categories</option>
+              <option value="Web Development">Web Development</option>
+              <option value="Design">Design</option>
+              <option value="Career">Career</option>
+              <option value="Data Science">Data Science</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <h5>Urgency</h5>
+            <select id="urgency-filter" style="width: 100%;">
+              <option value="">All urgency levels</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <h5>Skills</h5>
+            <div class="filter-option">
+              <input type="checkbox" id="skill-react" value="React" class="skill-filter">
+              <label for="skill-react">React</label>
+            </div>
+            <div class="filter-option">
+              <input type="checkbox" id="skill-figma" value="Figma" class="skill-filter">
+              <label for="skill-figma">Figma</label>
+            </div>
+            <div class="filter-option">
+              <input type="checkbox" id="skill-python" value="Python" class="skill-filter">
+              <label for="skill-python">Python</label>
+            </div>
+            <div class="filter-option">
+              <input type="checkbox" id="skill-html" value="HTML/CSS" class="skill-filter">
+              <label for="skill-html">HTML/CSS</label>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <h5>Location</h5>
+            <input type="text" id="location-filter" placeholder="Karachi, Lahore, Remote">
+          </div>
+
+          <button class="btn btn-secondary" style="width: 100%;" onclick="clearFilters()">Clear filters</button>
+        </div>
+
+        <!-- Requests List -->
+        <div class="requests-grid" id="requests-container">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="data/sample-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    let allRequests = [];
+
+    function loadRequests() {
+      allRequests = getRequests();
+      filterAndDisplay();
+    }
+
+    function filterAndDisplay() {
+      const categoryFilter = document.getElementById('category-filter').value;
+      const urgencyFilter = document.getElementById('urgency-filter').value;
+      const locationFilter = document.getElementById('location-filter').value.toLowerCase();
+      
+      const skillFilters = Array.from(document.querySelectorAll('.skill-filter:checked'))
+        .map(cb => cb.value);
+
+      let filtered = allRequests.filter(req => {
+        if (categoryFilter && req.category !== categoryFilter) return false;
+        if (urgencyFilter && req.urgency !== urgencyFilter) return false;
+        if (locationFilter && !req.location.toLowerCase().includes(locationFilter)) return false;
+        if (skillFilters.length > 0) {
+          const hasSkill = skillFilters.some(skill => req.tags.includes(skill));
+          if (!hasSkill) return false;
+        }
+        return true;
+      });
+
+      const container = document.getElementById('requests-container');
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">No requests match your filters.</p>';
+      } else {
+        container.innerHTML = filtered.map(req => renderRequestCard(req)).join('');
+      }
+    }
+
+    function clearFilters() {
+      document.getElementById('category-filter').value = '';
+      document.getElementById('urgency-filter').value = '';
+      document.getElementById('location-filter').value = '';
+      document.querySelectorAll('.skill-filter').forEach(cb => cb.checked = false);
+      filterAndDisplay();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadRequests();
+
+      document.getElementById('category-filter').addEventListener('change', filterAndDisplay);
+      document.getElementById('urgency-filter').addEventListener('change', filterAndDisplay);
+      document.getElementById('location-filter').addEventListener('input', filterAndDisplay);
+      document.querySelectorAll('.skill-filter').forEach(cb => {
+        cb.addEventListener('change', filterAndDisplay);
+      });
+    });
+  </script>
+</body>
+</html>

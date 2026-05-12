@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - HelpHub AI</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    .notifications-container {
+      max-width: 800px;
+      margin: var(--spacing-xl) auto;
+    }
+
+    .notification-item {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      box-shadow: var(--card-shadow);
+      transition: all var(--transition-base);
+      border-left: 4px solid transparent;
+    }
+
+    .notification-item:hover {
+      box-shadow: var(--card-shadow-lg);
+    }
+
+    .notification-item.unread {
+      background-color: rgba(13, 148, 136, 0.05);
+      border-left-color: var(--teal-accent);
+    }
+
+    .notification-item.read {
+      opacity: 0.7;
+    }
+
+    .notification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .notification-title {
+      font-weight: 600;
+      font-size: 1rem;
+      flex: 1;
+    }
+
+    .notification-time {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      white-space: nowrap;
+      margin-left: var(--spacing-md);
+    }
+
+    .notification-type {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--teal-accent);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .notification-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-md);
+    }
+
+    .notification-actions button {
+      font-size: 0.875rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: var(--spacing-3xl) var(--spacing-xl);
+    }
+
+    .empty-state p {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: var(--spacing-lg);
+    }
+
+    .filter-tabs button {
+      background: none;
+      border: none;
+      padding: var(--spacing-md) 0;
+      color: var(--text-muted);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      border-bottom: 2px solid transparent;
+    }
+
+    .filter-tabs button.active {
+      color: var(--teal-accent);
+      border-bottom-color: var(--teal-accent);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-badge">H</div>
+        <span>HelpHub AI</span>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="explore.html">Explore</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="ai-center.html">AI Center</a>
+        <a href="login.html" class="btn btn-primary btn-small">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container">
+      <p class="section-title" style="color: rgba(255, 255, 255, 0.7);">NOTIFICATIONS</p>
+      <h1>Stay updated on requests, helpers, and trust signals.</h1>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <div class="notifications-container">
+        <p class="section-title">LIVE UPDATES</p>
+        <h2 class="mb-lg">Notification feed</h2>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+          <button class="active" onclick="filterNotifications('all')">All</button>
+          <button onclick="filterNotifications('unread')">Unread</button>
+          <button onclick="filterNotifications('status')">Status</button>
+          <button onclick="filterNotifications('match')">Match</button>
+          <button onclick="filterNotifications('insight')">Insights</button>
+        </div>
+
+        <!-- Notifications List -->
+        <div id="notifications-list">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="data/sample-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    let allNotifications = [];
+    let currentFilter = 'all';
+
+    function loadNotifications() {
+      allNotifications = getNotifications();
+      displayNotifications();
+    }
+
+    function filterNotifications(filter) {
+      currentFilter = filter;
+
+      // Update active button
+      document.querySelectorAll('.filter-tabs button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      displayNotifications();
+    }
+
+    function displayNotifications() {
+      let filtered = allNotifications;
+
+      if (currentFilter === 'unread') {
+        filtered = filtered.filter(n => !n.read);
+      } else if (currentFilter !== 'all') {
+        filtered = filtered.filter(n => n.type === currentFilter);
+      }
+
+      const container = document.getElementById('notifications-list');
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p class="text-muted">No notifications to show.</p>
+            <a href="explore.html" class="btn btn-secondary">Browse requests</a>
+          </div>
+        `;
+      } else {
+        container.innerHTML = filtered.map(notif => `
+          <div class="notification-item ${notif.read ? 'read' : 'unread'}">
+            <div class="notification-header">
+              <div>
+                <div class="notification-type">${notif.type}</div>
+                <div class="notification-title">${notif.title}</div>
+              </div>
+              <div class="notification-time">${formatTime(notif.timestamp)}</div>
+            </div>
+            <div class="notification-actions">
+              <button class="btn btn-small btn-secondary" onclick="markAsRead('${notif.id}')">
+                ${notif.read ? 'Read' : 'Mark as read'}
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function markAsRead(notificationId) {
+      const notif = allNotifications.find(n => n.id === notificationId);
+      if (notif) {
+        notif.read = true;
+        localStorage.setItem('helphub_notifications', JSON.stringify(allNotifications));
+        displayNotifications();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadNotifications);
+  </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Request - HelpHub AI</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    .create-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-xl);
+      margin-top: var(--spacing-xl);
+    }
+
+    .form-panel {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--card-shadow);
+    }
+
+    .ai-panel {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--card-shadow);
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+    }
+
+    .ai-suggestion {
+      background-color: rgba(13, 148, 136, 0.05);
+      border-left: 3px solid var(--teal-accent);
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+      border-radius: var(--radius-md);
+    }
+
+    .ai-suggestion h5 {
+      color: var(--teal-accent);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .ai-suggestion p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-lg);
+    }
+
+    @media (max-width: 1024px) {
+      .create-container {
+        grid-template-columns: 1fr;
+      }
+
+      .ai-panel {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-badge">H</div>
+        <span>HelpHub AI</span>
+      </div>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="explore.html">Explore</a>
+        <a href="create-request.html">Create Request</a>
+        <a href="profile.html">Profile</a>
+        <a href="index.html" class="btn btn-secondary btn-small" onclick="localStorage.removeItem('helphub_currentUser')">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container">
+      <p class="section-title" style="color: rgba(255, 255, 255, 0.7);">CREATE REQUEST</p>
+      <h1>Turn a rough problem into a clear help request.</h1>
+      <p>Use built-in AI suggestions for category, urgency, tags, and a stronger description rewrite.</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <div class="create-container">
+        <!-- Form Panel -->
+        <div class="form-panel">
+          <form id="create-request-form">
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" id="request-title" placeholder="Need review on my JavaScript quiz app before submission" required>
+            </div>
+
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="request-description" placeholder="Explain the challenge, your current progress, deadline, and what kind of help would be useful." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Tags (comma-separated)</label>
+              <input type="text" id="request-tags" placeholder="JavaScript, Debugging, Review">
+            </div>
+
+            <div class="form-group">
+              <label>Category</label>
+              <select id="request-category" required>
+                <option value="">Select a category</option>
+                <option value="Web Development">Web Development</option>
+                <option value="Design">Design</option>
+                <option value="Career">Career</option>
+                <option value="Data Science">Data Science</option>
+                <option value="Mobile Development">Mobile Development</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Urgency</label>
+              <select id="request-urgency" required>
+                <option value="">Select urgency</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" onclick="generateSuggestions()">Apply AI suggestions</button>
+              <button type="submit" class="btn btn-primary">Publish request</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- AI Assistant Panel -->
+        <div class="ai-panel">
+          <p class="section-title">AI ASSISTANT</p>
+          <h4 class="mb-lg">Smart request guidance</h4>
+
+          <div id="ai-suggestions">
+            <p class="text-muted text-center py-lg">Fill in the form and click "Apply AI suggestions" to get recommendations.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="data/sample-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    function generateSuggestions() {
+      const title = document.getElementById('request-title').value;
+      const description = document.getElementById('request-description').value;
+
+      if (!title || !description) {
+        alert('Please fill in title and description first');
+        return;
+      }
+
+      const suggestionsPanel = document.getElementById('ai-suggestions');
+
+      // Mock AI suggestions
+      const suggestions = {
+        category: 'Web Development',
+        urgency: 'High',
+        tags: ['JavaScript', 'Debugging', 'Code Review'],
+        rewrite: 'I\'m working on a JavaScript quiz application and need a code review before submission. The app currently has some logic issues and I\'d like feedback on structure, performance, and best practices.'
+      };
+
+      suggestionsPanel.innerHTML = `
+        <div class="ai-suggestion">
+          <h5>Suggested category</h5>
+          <p>${suggestions.category}</p>
+        </div>
+
+        <div class="ai-suggestion">
+          <h5>Detected urgency</h5>
+          <p>${suggestions.urgency}</p>
+        </div>
+
+        <div class="ai-suggestion">
+          <h5>Suggested tags</h5>
+          <p>${suggestions.tags.join(', ')}</p>
+        </div>
+
+        <div class="ai-suggestion">
+          <h5>Rewrite suggestion</h5>
+          <p>Start describing the challenge to generate a stronger version.</p>
+        </div>
+
+        <button class="btn btn-secondary" style="width: 100%;" onclick="applySuggestions('${suggestions.category}', '${suggestions.urgency}', '${suggestions.tags.join(', ')}')">
+          Apply suggestions
+        </button>
+      `;
+    }
+
+    function applySuggestions(category, urgency, tags) {
+      document.getElementById('request-category').value = category;
+      document.getElementById('request-urgency').value = urgency;
+      document.getElementById('request-tags').value = tags;
+      alert('Suggestions applied!');
+    }
+
+    document.getElementById('create-request-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        navigateTo('login');
+        return;
+      }
+
+      const request = {
+        id: 'req-' + Date.now(),
+        title: document.getElementById('request-title').value,
+        description: document.getElementById('request-description').value,
+        category: document.getElementById('request-category').value,
+        urgency: document.getElementById('request-urgency').value,
+        status: 'Open',
+        requester: currentUser.id,
+        tags: document.getElementById('request-tags').value.split(',').map(t => t.trim()),
+        location: currentUser.location,
+        helpersInterested: 0,
+        createdAt: new Date().toISOString()
+      };
+
+      saveRequest(request);
+      alert('Request published successfully!');
+      navigateTo('dashboard');
+    });
+  </script>
+</body>
+</html>

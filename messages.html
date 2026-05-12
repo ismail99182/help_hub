@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages - HelpHub AI</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    .messages-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-xl);
+      margin-top: var(--spacing-xl);
+      min-height: 600px;
+    }
+
+    .messages-list {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      box-shadow: var(--card-shadow);
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .message-item {
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: background-color var(--transition-base);
+    }
+
+    .message-item:hover {
+      background-color: rgba(13, 148, 136, 0.05);
+    }
+
+    .message-item.active {
+      background-color: rgba(13, 148, 136, 0.1);
+      border-left: 3px solid var(--teal-accent);
+      padding-left: calc(var(--spacing-md) - 3px);
+    }
+
+    .message-header {
+      font-weight: 600;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .message-preview {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .message-time {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    .send-message-panel {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .send-message-panel h4 {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    #message-textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    @media (max-width: 1024px) {
+      .messages-container {
+        grid-template-columns: 1fr;
+      }
+
+      .messages-list {
+        max-height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-badge">H</div>
+        <span>HelpHub AI</span>
+      </div>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="explore.html">Explore</a>
+        <a href="messages.html">Messages</a>
+        <a href="profile.html">Profile</a>
+        <a href="index.html" class="btn btn-secondary btn-small" onclick="localStorage.removeItem('helphub_currentUser')">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container">
+      <p class="section-title" style="color: rgba(255, 255, 255, 0.7);">INTERACTION / MESSAGING</p>
+      <h1>Keep support moving through direct communication.</h1>
+      <p>Basic messaging gives helpers and requesters a clear follow-up path once a match happens.</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <div class="messages-container">
+        <!-- Messages List -->
+        <div>
+          <p class="section-title">CONVERSATION STREAM</p>
+          <h3 class="mb-lg">Recent messages</h3>
+          <div class="messages-list" id="messages-list">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Send Message Panel -->
+        <div>
+          <p class="section-title">SEND MESSAGE</p>
+          <h3 class="mb-lg">Start a conversation</h3>
+          <div class="send-message-panel">
+            <form id="send-message-form">
+              <div class="form-group">
+                <label>To</label>
+                <select id="recipient-select" required>
+                  <option value="">Select a recipient...</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Message</label>
+                <textarea id="message-textarea" placeholder="Share support details, ask for files, or suggest next steps." required></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%; padding: var(--spacing-md);">
+                Send
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="data/sample-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    let currentUser = null;
+    let selectedRecipient = null;
+
+    function loadMessages() {
+      currentUser = getCurrentUser();
+      if (!currentUser) {
+        navigateTo('login');
+        return;
+      }
+
+      const messages = getMessages();
+      const messagesList = document.getElementById('messages-list');
+
+      // Get unique conversations
+      const conversations = {};
+      messages.forEach(msg => {
+        const otherUser = msg.from === currentUser.id ? msg.to : msg.from;
+        if (!conversations[otherUser]) {
+          conversations[otherUser] = [];
+        }
+        conversations[otherUser].push(msg);
+      });
+
+      // Display conversations
+      if (Object.keys(conversations).length === 0) {
+        messagesList.innerHTML = '<p class="text-muted">No messages yet. Start a conversation!</p>';
+      } else {
+        messagesList.innerHTML = Object.entries(conversations).map(([userId, msgs]) => {
+          const user = getUserById(userId);
+          const lastMsg = msgs[msgs.length - 1];
+          return `
+            <div class="message-item" onclick="selectRecipient('${userId}')">
+              <div class="message-header">${user.name}</div>
+              <div class="message-preview">${lastMsg.content.substring(0, 50)}...</div>
+              <div class="message-time">${formatTime(lastMsg.timestamp)}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Populate recipient dropdown
+      const users = getUsers().filter(u => u.id !== currentUser.id);
+      const recipientSelect = document.getElementById('recipient-select');
+      recipientSelect.innerHTML = '<option value="">Select a recipient...</option>' + 
+        users.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+
+      // Check if recipient is in URL
+      const params = new URLSearchParams(window.location.search);
+      const toUserId = params.get('to');
+      if (toUserId) {
+        recipientSelect.value = toUserId;
+        selectedRecipient = toUserId;
+      }
+    }
+
+    function selectRecipient(userId) {
+      selectedRecipient = userId;
+      document.getElementById('recipient-select').value = userId;
+      document.querySelectorAll('.message-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      event.target.closest('.message-item').classList.add('active');
+    }
+
+    document.getElementById('send-message-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const recipientId = document.getElementById('recipient-select').value;
+      const content = document.getElementById('message-textarea').value;
+
+      if (!recipientId || !content.trim()) {
+        alert('Please select a recipient and enter a message');
+        return;
+      }
+
+      const message = {
+        id: 'msg-' + Date.now(),
+        from: currentUser.id,
+        to: recipientId,
+        content: content,
+        timestamp: new Date().toISOString(),
+        read: false
+      };
+
+      saveMessage(message);
+      document.getElementById('message-textarea').value = '';
+      alert('Message sent!');
+      loadMessages();
+    });
+
+    document.addEventListener('DOMContentLoaded', loadMessages);
+  </script>
+</body>
+</html>
